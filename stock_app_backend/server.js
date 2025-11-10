@@ -72,6 +72,44 @@ app.post('/api/transactions', async (req, res) => {
     }
 });
 
+// 3. POST /api/transactions/delete
+// 批量删除交易
+app.post('/api/transactions/delete', async (req, res) => {
+    try {
+        const { ids } = req.body; // 期望 { ids: [1, 2, 3] }
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: "无效的 ID 列表" });
+        }
+
+        // --- ⭐️ 修复开始 ⭐️ ---
+        // 1. 根据 ids 数组的长度动态创建占位符
+        // 例如: [1, 2] -> "?,?"
+        const placeholders = ids.map(() => '?').join(',');
+
+        // 2. 创建新的 SQL 字符串
+        const sql = `DELETE FROM transactions WHERE id IN (${placeholders})`;
+        // --- ⭐️ 修复结束 ⭐️ ---
+
+
+        // 3. ⭐️ 重要修复：
+        //    执行时，直接传递 ids 数组 (例如 [1, 2])
+        //    而不是像以前那样传递 [ids] (例如 [[1, 2]])
+        const [result] = await dbPool.execute(sql, ids);
+
+
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: `成功删除 ${result.affectedRows} 条记录` });
+        } else {
+            res.status(404).json({ message: "未找到要删除的记录" });
+        }
+    } catch (error) {
+        console.error("删除数据失败:", error);
+        res.status(500).json({ message: "服务器错误" });
+    }
+});
+
+
 // 启动服务器
 app.listen(PORT, () => {
     console.log(`后端 API 运行在 http://localhost:${PORT}`);
