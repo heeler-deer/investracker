@@ -18,3 +18,22 @@ CREATE TABLE transactions (
     INDEX(stock_name),
     INDEX(transaction_date)
 ) COMMENT='交易记录表';
+
+
+
+ALTER TABLE transactions
+    
+    -- 1. 修改 stock_name 的注释
+    MODIFY COLUMN stock_name VARCHAR(255) NOT NULL COMMENT '股票/基金名称',
+    
+    -- 2. 修改 direction 的注释 (类型不变, 仍为 NOT NULL)
+    MODIFY COLUMN direction VARCHAR(10) NOT NULL COMMENT '投资方向: Buy / Sell / Dividend',
+    
+    -- 3. 修改 volume 允许 NULL (原表为 NOT NULL)
+    MODIFY COLUMN volume DECIMAL(18, 4) NULL COMMENT '成交股数/份额 (分红时可为空)',
+    
+    -- 4. 修改 price 允许 NULL (原表为 NOT NULL)
+    MODIFY COLUMN price DECIMAL(18, 6) NULL COMMENT '成交单价/净值 (分红时可为空)',
+    
+    -- 5. 新增 dividend_amount 字段 (在 fee 字段后面)
+    ADD COLUMN dividend_amount DECIMAL(18, 2) NULL COMMENT '分红金额' AFTER fee;

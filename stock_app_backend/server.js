@@ -9,8 +9,7 @@ app.use(express.json()); // 解析前端发来的 JSON 数据
 
 const PORT = 3000; // 后端运行在 3000 端口
 
-// 数据库连接池配置
-// 确保使用你自己的数据库、用户和密码
+// ... dbPool ...
 const dbPool = mysql.createPool({
     host: 'localhost',
     user: 'stock_app_user',      // 你的新用户名
@@ -19,17 +18,14 @@ const dbPool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    // ⭐️ 让数据库返回的 DECIMAL 保持为数字 (Number)
     decimalNumbers: true 
 });
 
 // --- API 路由 ---
 
-// 1. GET /api/transactions
-// 获取所有交易记录
+// 1. GET /api/transactions (无变化)
 app.get('/api/transactions', async (req, res) => {
     try {
-        // 永远按日期排序，这对于前端计算至关重要
         const [rows] = await dbPool.query("SELECT * FROM transactions ORDER BY transaction_date ASC, id ASC");
         res.json(rows);
     } catch (error) {
@@ -38,29 +34,42 @@ app.get('/api/transactions', async (req, res) => {
     }
 });
 
-// 2. POST /api/transactions
-// 添加一笔新交易
+// 2. POST /api/transactions (⭐️ 变更)
+// 添加一笔新交易 (支持分红)
 app.post('/api/transactions', async (req, res) => {
     try {
+        // ⭐️ 变更 1：解构出 dividendAmount
         const { 
-            stockName, direction, date, industry, category, volume, price, fee 
+            stockName, direction, date, industry, category, 
+            volume, price, fee, dividendAmount // 新增 dividendAmount
         } = req.body;
 
+        // ⭐️ 变更 2：更新 SQL 语句以包含 dividend_amount
         const sql = `
             INSERT INTO transactions 
-            (stock_name, direction, transaction_date, industry, category, volume, price, fee)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (stock_name, direction, transaction_date, industry, category, volume, price, fee, dividend_amount)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const values = [stockName, direction, date, industry, category, volume, price, fee];
+        // ⭐️ 变更 3：更新插入的值
+        //    (前端逻辑会确保分红时 volume/price/fee 为 null 或 0)
+        const values = [
+            stockName, 
+            direction, 
+            date, 
+            industry || null, 
+            category || 'Stock', // 分红默认归类为 Stock
+            volume || null, 
+            price || null, 
+            fee || 0, 
+            dividendAmount || null
+        ];
 
         const [result] = await dbPool.execute(sql, values);
 
-        // ⭐️ 新增：根据 insertId 获取刚插入的完整数据
         const [newRows] = await dbPool.query("SELECT * FROM transactions WHERE id = ?", [result.insertId]);
         
         if (newRows.length > 0) {
-            // 返回从数据库中查到的实际数据 (确保 snake_case 字段名)
             res.status(201).json(newRows[0]);
         } else {
             throw new Error('无法检索新插入的记录');
@@ -72,31 +81,19 @@ app.post('/api/transactions', async (req, res) => {
     }
 });
 
-// 3. POST /api/transactions/delete
-// 批量删除交易
+// 3. POST /api/transactions/delete (无变化)
 app.post('/api/transactions/delete', async (req, res) => {
     try {
-        const { ids } = req.body; // 期望 { ids: [1, 2, 3] }
+        const { ids } = req.body; 
 
         if (!ids || !Array.isArray(ids) || ids.length === 0) {
             return res.status(400).json({ message: "无效的 ID 列表" });
         }
 
-        // --- ⭐️ 修复开始 ⭐️ ---
-        // 1. 根据 ids 数组的长度动态创建占位符
-        // 例如: [1, 2] -> "?,?"
         const placeholders = ids.map(() => '?').join(',');
-
-        // 2. 创建新的 SQL 字符串
         const sql = `DELETE FROM transactions WHERE id IN (${placeholders})`;
-        // --- ⭐️ 修复结束 ⭐️ ---
-
-
-        // 3. ⭐️ 重要修复：
-        //    执行时，直接传递 ids 数组 (例如 [1, 2])
-        //    而不是像以前那样传递 [ids] (例如 [[1, 2]])
+        
         const [result] = await dbPool.execute(sql, ids);
-
 
         if (result.affectedRows > 0) {
             res.status(200).json({ message: `成功删除 ${result.affectedRows} 条记录` });
