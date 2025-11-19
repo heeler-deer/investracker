@@ -107,6 +107,49 @@ app.post('/api/transactions/delete', async (req, res) => {
 });
 
 
+
+
+// --- 新增: Memo API ---
+
+// 1.XZ 获取所有日记
+app.get('/api/memos', async (req, res) => {
+    try {
+        const [rows] = await dbPool.query("SELECT * FROM memos ORDER BY memo_date DESC, id DESC");
+        res.json(rows);
+    } catch (error) {
+        console.error("获取日记失败:", error);
+        res.status(500).json({ message: "服务器错误" });
+    }
+});
+
+// 2.vZ 添加日记
+app.post('/api/memos', async (req, res) => {
+    try {
+        const { content, date } = req.body;
+        const sql = "INSERT INTO memos (content, memo_date) VALUES (?, ?)";
+        const [result] = await dbPool.execute(sql, [content, date]);
+        
+        const [newRows] = await dbPool.query("SELECT * FROM memos WHERE id = ?", [result.insertId]);
+        res.status(201).json(newRows[0]);
+    } catch (error) {
+        console.error("添加日记失败:", error);
+        res.status(500).json({ message: "服务器错误" });
+    }
+});
+
+// 3. 删除日记
+app.delete('/api/memos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await dbPool.execute("DELETE FROM memos WHERE id = ?", [id]);
+        res.status(200).json({ message: "删除成功" });
+    } catch (error) {
+        res.status(500).json({ message: "服务器错误" });
+    }
+});
+
+
+
 // 启动服务器
 app.listen(PORT, () => {
     console.log(`后端 API 运行在 http://localhost:${PORT}`);

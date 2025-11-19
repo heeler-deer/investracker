@@ -37,3 +37,17 @@ ALTER TABLE transactions
     
     -- 5. 新增 dividend_amount 字段 (在 fee 字段后面)
     ADD COLUMN dividend_amount DECIMAL(18, 2) NULL COMMENT '分红金额' AFTER fee;
+
+
+
+-- 在 stock_tracker 数据库中执行
+
+CREATE TABLE memos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content TEXT NOT NULL COMMENT '日记/备注内容',
+    memo_date DATE NOT NULL COMMENT '日期',
+    tags VARCHAR(255) NULL COMMENT '标签 (预留功能)',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX(memo_date)
+) COMMENT='投资日记表';
