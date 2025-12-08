@@ -1,13 +1,16 @@
 /* src/style.css */
 :root {
-  --apple-bg: #f5f5f7; /* 典型的 Apple 浅灰色背景 */
-  --apple-card-bg: rgba(255, 255, 255, 0.85);
-  --apple-sidebar-bg: rgba(245, 245, 247, 0.8);
-  --apple-text: #1d1d1f;
-  --apple-blue: #0071e3;
-  --apple-radius: 12px;
-  --apple-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --apple-bg: #f5f5f7; 
+  --apple-card-bg: #ffffff; 
+  --apple-sidebar-bg: rgba(242, 242, 247, 0.8);
+  --apple-text: #1d1d1f; 
+  --apple-text-secondary: #86868b;
+  --apple-blue: #0071e3; 
+  --apple-radius: 16px; 
+  --apple-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --apple-border: 1px solid rgba(0, 0, 0, 0.06); 
+  --font-stack: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-display: "SF Pro Display", var(--font-stack);
 }
 
 body {
@@ -17,64 +20,225 @@ body {
   background-color: var(--apple-bg);
   color: var(--apple-text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 覆盖 Element Plus 的默认样式以更接近 Apple */
+/* --- Element Plus 组件覆盖 --- */
+
 .el-button--primary {
   background-color: var(--apple-blue) !important;
   border-color: var(--apple-blue) !important;
-  border-radius: 8px !important;
+  border-radius: 999px !important;
+  font-weight: 500;
+  padding: 10px 20px !important;
+  box-shadow: 0 2px 4px rgba(0, 113, 227, 0.2);
+  transition: transform 0.1s ease, background-color 0.2s;
+}
+.el-button--primary:active {
+  transform: scale(0.97);
 }
 
-.el-card {
-  border-radius: var(--apple-radius) !important;
+.apple-btn-submit {
+  height: 34px !important;
+  border-radius: 10px !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.apple-btn-danger {
+  border-radius: 999px !important;
+  background-color: #fff !important;
+  border: 1px solid #ff3b30 !important;
+  color: #ff3b30 !important;
+}
+.apple-btn-danger:hover {
+  background-color: #fff0f0 !important;
+}
+
+/* 筛选按钮 */
+.filter-toggle-btn {
+  font-weight: 500;
+  margin-left: 10px;
+  color: var(--apple-blue);
+}
+
+/* 2. 卡片 */
+.apple-card {
   border: none !important;
+  border-radius: var(--apple-radius) !important;
   box-shadow: var(--apple-shadow) !important;
-  background-color: var(--apple-card-bg) !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: saturate(180%) blur(20px);
+  padding-bottom: 2px;
 }
 
-.el-table {
-  --el-table-header-bg-color: transparent !important;
-  --el-table-tr-bg-color: transparent !important;
+.apple-content-card {
+  background-color: var(--apple-card-bg);
+  border-radius: var(--apple-radius);
+  box-shadow: var(--apple-shadow);
+  padding: 0;
+  border: var(--apple-border);
+  overflow: hidden; 
+  display: flex;
+  flex-direction: column;
+}
+
+/* 3. 输入框与表单 */
+.apple-input .el-input__wrapper,
+.apple-select .el-select__wrapper,
+.apple-input-number .el-input__wrapper {
+  background-color: #f2f2f7 !important;
+  box-shadow: none !important;
+  border-radius: 10px !important;
+  padding: 1px 11px !important;
+  transition: all 0.2s ease;
+}
+
+.apple-input .el-input__wrapper:hover,
+.apple-select .el-select__wrapper:hover,
+.apple-input-number .el-input__wrapper:hover {
+  background-color: #e5e5ea !important;
+}
+
+.apple-input .el-input__wrapper.is-focus,
+.apple-select .el-select__wrapper.is-focused,
+.apple-input-number .el-input__wrapper.is-focus {
+  background-color: #fff !important;
+  box-shadow: 0 0 0 2px var(--apple-blue) !important;
+}
+
+.apple-input-number .el-input-number__decrease,
+.apple-input-number .el-input-number__increase {
+  display: none;
+}
+.apple-input-number .el-input__inner {
+  text-align: left !important;
+}
+
+.transaction-form .el-form-item {
+  margin-bottom: 20px;
+}
+.transaction-form .el-form-item__label {
+  padding-bottom: 4px !important;
+  font-size: 13px !important;
+  color: var(--apple-text-secondary) !important;
+  line-height: 1.2 !important;
+}
+
+/* ⭐️ 筛选面板样式 */
+.filter-panel {
+  background-color: #f9f9fc;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 16px 20px;
+}
+.filter-item {
+  display: flex;
+  flex-direction: column;
+}
+.filter-label {
+  font-size: 12px;
+  color: #86868b;
+  margin-bottom: 4px;
+}
+
+/* --- 表格样式 --- */
+.apple-table {
+  --el-table-header-bg-color: #fff !important;
+  --el-table-tr-bg-color: #fff !important;
+  --el-table-row-hover-bg-color: #f5f5f7 !important;
   background-color: transparent !important;
 }
 
-/* 侧边栏导航样式 */
+.apple-table th.el-table__cell {
+  font-weight: 600;
+  color: var(--apple-text-secondary);
+  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+  background-color: #fff !important;
+  height: 48px;
+}
+
+.apple-table td.el-table__cell {
+  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+  padding: 14px 0 !important;
+  background-color: #fff;
+}
+
+/* 固定列 */
+.apple-table .el-table__cell.is-fixed-left,
+.apple-table .el-table__cell.is-fixed-right {
+  background-color: #fff !important;
+  z-index: 2;
+  border-right: 1px solid rgba(0,0,0,0.03);
+}
+
+.apple-table .el-table__row:hover .el-table__cell.is-fixed-left,
+.apple-table .el-table__row:hover .el-table__cell.is-fixed-right {
+  background-color: #f5f5f7 !important;
+}
+
+/* 分红行 */
+:deep(.dividend-row) td {
+  background-color: rgba(0, 113, 227, 0.02) !important;
+}
+:deep(.dividend-row:hover) td {
+  background-color: rgba(0, 113, 227, 0.05) !important;
+}
+:deep(.dividend-row) .is-fixed-left {
+  background-color: #fbfdff !important;
+}
+:deep(.dividend-row:hover) .is-fixed-left {
+  background-color: #f0f7ff !important;
+}
+
+
+/* --- 侧边栏样式 --- */
 .sidebar-menu {
   height: 100vh;
-  border-right: 1px solid rgba(0,0,0,0.05);
+  border-right: 1px solid rgba(0,0,0,0.08);
   background-color: var(--apple-sidebar-bg);
-  padding-top: 20px;
+  backdrop-filter: blur(20px);
+  padding: 30px 16px 20px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-title {
-  padding: 0 20px 20px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #86868b;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 24px;
+  padding-left: 12px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #1d1d1f 0%, #48484a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  margin: 4px 10px;
-  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 10px;
   color: var(--apple-text);
   text-decoration: none;
+  font-size: 15px;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .nav-item:hover {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(0,0,0,0.04);
 }
 
 .nav-item.router-link-active {
   background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   color: var(--apple-blue);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  font-weight: 600;
 }
 
 .nav-icon {
@@ -82,16 +246,44 @@ body {
   font-size: 18px;
 }
 
+/* --- 布局容器 --- */
 .page-container {
-  padding: 30px;
+  padding: 24px 32px;
   height: 100vh;
   overflow-y: auto;
   box-sizing: border-box;
 }
 
-.page-header-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  letter-spacing: -0.5px;
+.table-toolbar {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 40px;
+}
+.toolbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.table-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--apple-text);
+}
+
+.footer-area {
+  flex-shrink: 0;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.apple-pagination {
+  padding: 10px 0;
+  display: flex; 
+  justify-content: center;
 }
