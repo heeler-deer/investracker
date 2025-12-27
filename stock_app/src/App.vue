@@ -8,6 +8,11 @@
         <span>交易记录</span>
       </router-link>
       
+      <router-link to="/analysis" class="nav-item">
+        <el-icon class="nav-icon"><PieChart /></el-icon>
+        <span>数据分析</span>
+      </router-link>
+
       <router-link to="/memos" class="nav-item">
         <el-icon class="nav-icon"><Notebook /></el-icon>
         <span>投资笔记</span>
